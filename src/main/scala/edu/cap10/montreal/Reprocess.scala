@@ -41,8 +41,8 @@ object Reprocess extends App {
     val sampleStream = fileToObsStream(Source.fromFile(file)).map({
       obs => Observation(obs.user + uidOffset, locMap(obs.loc.toInt-1), obs.start + timeOffset, obs.end + timeOffset, obs.reason)
     })
-    val cc_printer = new PrintWriter(new File(file.toString.replace(".csv", f"-cc-$window.csv")))
-    val cu_printer = new PrintWriter(new File(file.toString.replace(".csv", f"-cu-$window.csv")))
+    val cc_printer = new PrintWriter(new File(file.toString.replace(".csv", f"-$window-cc.csv")))
+    val cu_printer = new PrintWriter(new File(file.toString.replace(".csv", f"-$window-cu.csv")))
     val cc_rec = recorder(cc_printer)
     val cu_rec = recorder(cu_printer)
     
