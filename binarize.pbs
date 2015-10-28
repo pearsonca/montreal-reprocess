@@ -1,11 +1,11 @@
 #!/bin/bash
 #PBS -r n
-#PBS -N muri-pairs
-#PBS -o m-pairs.o
-#PBS -e m-pairs.err
+#PBS -N binarize
+#PBS -o binarize.o
+#PBS -e binarize.err
 #PBS -m a
 #PBS -M cap10@ufl.edu
-#PBS -l walltime=6:00:00
+#PBS -l walltime=00:30:00
 #PBS -l nodes=1:ppn=8
 #PBS -l pmem=1G
 #PBS -t 1-1620
