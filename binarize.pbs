@@ -1,0 +1,28 @@
+#!/bin/bash
+#PBS -r n
+#PBS -N muri-pairs
+#PBS -o m-pairs.o
+#PBS -e m-pairs.err
+#PBS -m a
+#PBS -M cap10@ufl.edu
+#PBS -l walltime=6:00:00
+#PBS -l nodes=1:ppn=8
+#PBS -l pmem=1G
+#PBS -t 1-1620
+
+module load scala/2.11.5
+module load java/1.8.0_31
+cd /scratch/lfs/cap10/montreal-reprocess
+parameters=`cat sim-src.pars | tail -n +$PBS_ARRAYID | head -1`
+IFS=', ' read -a elems <<< "$parameters"
+sz=${elems[3]}
+k=${elems[4]}
+fr=${elems[5]}
+m=${elems[6]}
+l=${elems[7]}
+pth=${elems[0]}-${elems[1]}-${elems[2]}-$sz
+sub=output/$pth-$fr-$m-$l
+cd $sub
+tar -cvzf runs.tar.gz *.csv # zip up source files
+Rscript ../../binarize.R # convert to RData files, trimmed by first / last location appearance
+rm *.csv # delete all csvs
