@@ -12,4 +12,4 @@ combos <- function(cu, cc) {
   newfile <- sub("cu.csv","combos.RData", cu)
   saveRDS(res, newfile)
 }
-mapply(combos, cufiles, ccfiles)
+res <- mapply(combos, cufiles, ccfiles)
