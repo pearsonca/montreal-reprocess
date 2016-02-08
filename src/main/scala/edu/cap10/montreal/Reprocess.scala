@@ -19,47 +19,50 @@ object Reprocess extends App {
   val reproRoot = args(0)
   val uidOffset = args(1).toInt
   val timeOffset = args(2).toInt
-  implicit val window = if (args.length == 4) args(3).toInt else 0
-   
+  val tardir = args(3)
+  implicit val window = if (args.length == 5) args(4).toInt else 0
+
   import java.io._
-  
+
   def recorder(pw:PrintWriter) = {
-    
+
     (l:List[PairObservation]) => {
       l foreach {
         pw println _
       }
     }
   }
-  
+
   for {
-    file <- new File(reproRoot).listFiles.filter({ f => { 
+    file <- new File(reproRoot).listFiles.filter({ f => {
       val nm = f.getName
       !(nm.endsWith("cc.csv") || nm.endsWith("cu.csv"))
     }  }).toIterator if file.isFile
   } {
+    println(file)
     val sampleStream = fileToObsStream(Source.fromFile(file)).map({
       obs => Observation(obs.user + uidOffset, locMap(obs.loc.toInt-1), obs.start + timeOffset, obs.end + timeOffset, obs.reason)
     })
-    val cc_printer = new PrintWriter(new File(file.toString.replace(".csv", f"-$window-cc.csv")))
-    val cu_printer = new PrintWriter(new File(file.toString.replace(".csv", f"-$window-cu.csv")))
+    println(file.toString.replace(".csv", f"-$window-cc.csv").replaceAll(".+/", tardir))
+    val cc_printer = new PrintWriter(new File(file.toString.replace(".csv", f"-$window-cc.csv").replaceAll(".+/", tardir)))
+    val cu_printer = new PrintWriter(new File(file.toString.replace(".csv", f"-$window-cc.csv").replaceAll(".+/", tardir)))
     val cc_rec = recorder(cc_printer)
     val cu_rec = recorder(cu_printer)
-    
+
     // now intersect sampleStream w/ self -> cc pairs
     // intersect sampleStream w/ ref -> cu pairs
-    
+
     parse(sampleStream.head, sampleStream.tail)(cc_rec)
     cc_printer.flush()
     cc_printer.close()
-    
+
     sampleStream.foldLeft(refObservations)({
       (remainingstream, cov) => parseOne(cov, refObservations)(cu_rec)
     })
-       
+
     cu_printer.flush()
     cu_printer.close()
-    
-    
+
+
   }
 }
