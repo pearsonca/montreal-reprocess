@@ -70,15 +70,13 @@ object Reprocess extends App {
     
   } else {
     val reproRoot = args(0)
-    
-    val timeOffset = args(2).toInt
-    val tardir = args(3)
-    implicit val window = if (args.length == 5) args(4).toInt else 0
+    val timeOffset = args(1).toInt
+    val tardir = args(2)
+    implicit val window = if (args.length == 4) args(3).toInt else 0
   
     import java.io._
   
     def recorder(pw:PrintWriter) = {
-  
       (l:List[PairObservation]) => {
         l foreach {
           pw println _
