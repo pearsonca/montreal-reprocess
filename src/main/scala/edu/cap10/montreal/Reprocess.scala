@@ -63,60 +63,49 @@ object Reprocess extends App {
 //   supercomputer over sim types
 //   for each type, specify root
   
-  if (args.length == 1) { // reprocess original data
-//    import shared._
-    // TODO move the rest of that commented code here
-    // get the paired.o version working
-    
-  } else {
-    val reproRoot = args(0)
-    val timeOffset = args(1).toInt
-    val tardir = args(2)
-    implicit val window = if (args.length == 4) args(3).toInt else 0
+//  if (args.length == 1) { // reprocess original data
+////    import shared._
+//    // TODO move the rest of that commented code here
+//    // get the paired.o version working
+//    
+//  } else {
+    val tarfile = args(0)
+//    val timeOffset = args(1).toInt
+    implicit val window = if (args.length == 2) args(1).toInt else 0
   
     import java.io._
   
     def recorder(pw:PrintWriter) = {
       (l:List[PairObservation]) => {
-        l foreach {
-          pw println _
-        }
+        l foreach { pw println _ }
       }
     }
   
-    for {
-      file <- new File(reproRoot).listFiles.filter({ f => {
-        val nm = f.getName
-        !(nm.endsWith("cc.csv") || nm.endsWith("cu.csv"))
-      }  }).toIterator if file.isFile
-    } {
-      println(file)
-      val sampleStream = fileToObsStream(Source.fromFile(file)).map({
-        obs => Observation(-obs.user, locMap(obs.loc.toInt-1), obs.start + timeOffset, obs.end + timeOffset, obs.reason)
-      })
-      println(file.toString.replace(".csv", f"-$window-cc.csv").replaceAll(".+/", tardir))
-      val cc_printer = new PrintWriter(new File(file.toString.replace(".csv", f"-$window-cc.csv").replaceAll(".+/", tardir)))
-      val cu_printer = new PrintWriter(new File(file.toString.replace(".csv", f"-$window-cu.csv").replaceAll(".+/", tardir)))
-      val cc_rec = recorder(cc_printer)
-      val cu_rec = recorder(cu_printer)
-  
-      // now intersect sampleStream w/ self -> cc pairs
-      // intersect sampleStream w/ ref -> cu pairs
-  
-      parse(sampleStream.head, sampleStream.tail)(cc_rec)
-      cc_printer.flush()
-      cc_printer.close()
-  
-      sampleStream.foldLeft(refObservations)({
-        (remainingstream, cov) => parseOne(cov, refObservations)(cu_rec)
-      })
-  
-      cu_printer.flush()
-      cu_printer.close()
-  
-  
-    }
-  }
+    val sampleStream = fileToObsStream(Source.fromFile(tarfile))
+//    .map({
+//      obs => Observation(-obs.user, locMap(obs.loc.toInt-1), obs.start + timeOffset, obs.end + timeOffset, obs.reason)
+//    })
+    println(tarfile.toString.replace("-trans.csv", f"-$window-cc.csv"))
+    val cc_printer = new PrintWriter(new File(tarfile.replace("-trans.csv", f"-$window-cc.csv")))
+    val cu_printer = new PrintWriter(new File(tarfile.replace("-trans.csv", f"-$window-cu.csv")))
+    val cc_rec = recorder(cc_printer)
+    val cu_rec = recorder(cu_printer)
+
+    // now intersect sampleStream w/ self -> cc pairs
+    // intersect sampleStream w/ ref -> cu pairs
+
+    parse(sampleStream.head, sampleStream.tail)(cc_rec)
+    cc_printer.flush()
+    cc_printer.close()
+
+    sampleStream.foldLeft(refObservations)({
+      (remainingstream, cov) => parseOne(cov, refObservations)(cu_rec)
+    })
+
+    cu_printer.flush()
+    cu_printer.close()
+
+//  }
 
 }
 
