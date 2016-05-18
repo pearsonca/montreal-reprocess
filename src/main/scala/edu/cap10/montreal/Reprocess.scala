@@ -5,7 +5,7 @@ import scala.annotation.tailrec
 import scala.util.parsing.combinator.RegexParsers
 import scala.collection.immutable.Stream.Empty
 
-//object shared {  
+//object shared {
 //  type Time = Long
 //  type UserID = Int
 //  type LocID = Int
@@ -23,28 +23,28 @@ import scala.collection.immutable.Stream.Empty
 //    }
 //    def upEnd(newEnd:Time) = Observation(user, loc, start, newEnd)
 //  }
-//  
+//
 //  object ObservationParser extends RegexParsers {
 //    def uid: Parser[UserID] = """\d+""".r ^^ { _.toInt }
 //    def lid: Parser[LocID] = """\d+""".r ^^ { _.toInt }
 //    def time: Parser[Time] = """\d+""".r ^^ { _.toLong }
-//    def obs: Parser[Observation] = 
+//    def obs: Parser[Observation] =
 //      (uid~lid~time~time) ^^ { case u~l~s~e => Observation(u,l,s,e) }
-//    def apply(input:String) : Observation = 
+//    def apply(input:String) : Observation =
 //      parseAll(obs, input) match {
 //      case Success(obs,_) => obs
 //      case _ => Observation(-1,-1,-1,-1)
-//    }  
+//    }
 //  }
-//  
-//  def parseFile(path:String) : Iterator[Observation] = 
+//
+//  def parseFile(path:String) : Iterator[Observation] =
 //    Source.fromFile(path).getLines.map( ObservationParser(_) )
-//  
+//
 //  case class PairObs(userA:UserID, userB:UserID, start:Time, end: Time)
-// 
-//  def intersect(one:Observation, two:Observation) : PairObs = 
+//
+//  def intersect(one:Observation, two:Observation) : PairObs =
 //    PairObs(one.user, two.user, Math.max(one.start, two.start), Math.min(one.end, two.end))
-//  
+//
 //}
 
 
@@ -62,32 +62,32 @@ object Reprocess extends App {
 //   make merged.o -> series of observations (once) - binarize?
 //   supercomputer over sim types
 //   for each type, specify root
-  
+
 //  if (args.length == 1) { // reprocess original data
 ////    import shared._
 //    // TODO move the rest of that commented code here
 //    // get the paired.o version working
-//    
+//
 //  } else {
     val tarfile = args(0)
 //    val timeOffset = args(1).toInt
     implicit val window = if (args.length == 2) args(1).toInt else 0
-  
+
     import java.io._
-  
+
     def recorder(pw:PrintWriter) = {
       (l:List[PairObservation]) => {
         l foreach { pw println _ }
       }
     }
-  
+
     val sampleStream = fileToObsStream(Source.fromFile(tarfile))
 //    .map({
 //      obs => Observation(-obs.user, locMap(obs.loc.toInt-1), obs.start + timeOffset, obs.end + timeOffset, obs.reason)
 //    })
-    println(tarfile.toString.replace("-trans.csv", f"-$window-cc.csv"))
-    val cc_printer = new PrintWriter(new File(tarfile.replace("-trans.csv", f"-$window-cc.csv")))
-    val cu_printer = new PrintWriter(new File(tarfile.replace("-trans.csv", f"-$window-cu.csv")))
+    println(tarfile.toString.replace("trans.csv", "cc.csv"))
+    val cc_printer = new PrintWriter(new File(tarfile.replace("trans.csv", "cc.csv")))
+    val cu_printer = new PrintWriter(new File(tarfile.replace("trans.csv", "cu.csv")))
     val cc_rec = recorder(cc_printer)
     val cu_rec = recorder(cu_printer)
 
@@ -140,7 +140,7 @@ object Reprocess extends App {
 //  }
 //
 //  import java.io.{File, FilenameFilter}
-//  
+//
 ////  def main(args:Array[String]) : Unit = {
 ////    val baseStream = parseFile("/Users/carlpearson/Dropbox/montreal/merged.o").toStream // args(0)
 ////    val mergeSrc = "/Users/carlpearson/scala-commsim/simdata" // args(1)
@@ -157,13 +157,13 @@ object Reprocess extends App {
 ////      fw.flush()
 ////      fw.close()
 ////    }
-////    
+////
 ////    // iterate over file in mergeSrc that match .sim
 ////    // parse(merge(basefile, simfile)) // with fw corresponding to .sim filename, but .sim replaced w/ .uu
 ////
 ////    // TODO receive a margin-of-error separate for overlaps
 ////    // val oname = "/Users/carlpearson/Dropbox/epidemics4share/paired.o" // args(2)
-////    
+////
 ////  }
 //
 //  final def extract(head:Observation, tail:Stream[Observation]) : List[PairObs] = {
@@ -174,7 +174,7 @@ object Reprocess extends App {
 //  final def parseOne(x:Observation, rest:Stream[Observation])(implicit recorder: List[PairObs]=>Unit ) = {
 //    recorder(extract(x, rest))
 //  }
-//  
+//
 //  @tailrec
 //  final def parse(stream:Stream[Observation])(implicit recorder: List[PairObs]=>Unit )
 //    : Unit = stream match {
